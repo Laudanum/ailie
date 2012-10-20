@@ -70,3 +70,17 @@ I had to make a couple of manual changes to .git/config
 ##Push updates to upstream##
 
 `$ git push upstream`
+
+##Diff between this version and upstream##
+
+`$ git fetch upstream master`
+
+Determine the changesets in upstream that you want to look at then:
+`$ git diff d6bff52..63eca88`
+
+##Create a patch between this version and upstream##
+
+In case we want to push back some changes to upstream but not everything.
+http://gitready.com/intermediate/2009/03/04/pick-out-individual-commits.html
+http://ariejan.net/2010/06/10/cherry-picking-specific-commits-from-another-branch
+http://technosophos.com/content/git-cherry-picking-move-small-code-patches-across-branches
