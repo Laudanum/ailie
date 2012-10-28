@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Ailie workshops feature.
+ */
+
+include_once 'ailie_workshops.features.inc';

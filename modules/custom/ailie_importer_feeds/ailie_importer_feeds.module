@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Ailie importer feeds feature.
+ */
+
+include_once 'ailie_importer_feeds.features.inc';

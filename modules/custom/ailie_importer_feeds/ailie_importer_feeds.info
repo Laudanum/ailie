@@ -1,0 +1,11 @@
+name = Ailie importer feeds
+description = The feeds configured to import from isEngine
+core = 7.x
+package = Ailie
+version = 7.x-0.1
+project = ailie_importer_feeds
+dependencies[] = ailie_importer
+dependencies[] = feeds
+features[ctools][] = feeds:feeds_importer_default:1
+features[features_api][] = api:1
+features[feeds_importer][] = isengine
