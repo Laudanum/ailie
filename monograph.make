@@ -54,6 +54,9 @@ libraries[lessphp][download][type] = "git"
 libraries[lessphp][download][url] = "git://github.com/leafo/lessphp.git"
 libraries[lessphp][destination] = "libraries"   
 
+projects[feeds][subdir] = "contrib"
+projects[job_scheduler][subdir] = "contrib"
+
 ; projects
 projects[nodequeue][subdir] = "contrib"
 projects[webform][subdir] = "contrib"
