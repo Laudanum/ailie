@@ -19,6 +19,8 @@ core = 7.x
 api = 2
 
 ; utils
+projects[strongarm][subdir] = "contrib"
+
 projects[profiler][subdir] = "contrib"
 ; needs dev for devel generate support of dev version of field collection
 projects[entity][subdir] = "contrib"
@@ -66,6 +68,7 @@ projects[link][subdir] = "contrib"
 projects[date][subdir] = "contrib"
 projects[field_collection][subdir] = "contrib"
 projects[field_collection][version] = "1.x-dev"
+projects[entityreference][version] = "1.x-dev"
 
 ; social
 projects[addthis][subdir] = "contrib"

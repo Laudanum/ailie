@@ -60,34 +60,34 @@ dependencies[] = views_ui
 
 dependencies[] = ctools
 dependencies[] = file_entity
-dependencies[] = media
+; dependencies[] = media
 ; http://drupal.org/node/1319000
 ; fixes site install bug (Attempt to create a field of unknown type media)
-dependencies[] = mediafield
-dependencies[] = media_internet
-dependencies[] = media_vimeo
-dependencies[] = media_youtube
-dependencies[] = media_soundcloud
-dependencies[] = insert
-dependencies[] = monograph_media
+; dependencies[] = mediafield
+; dependencies[] = media_internet
+; dependencies[] = media_vimeo
+; dependencies[] = media_youtube
+; dependencies[] = media_soundcloud
+; dependencies[] = insert
+; dependencies[] = monograph_media
 ; dependencies[] = styles
 ; dependencies[] = file_styles
 
 ; Monograph features
-dependencies[] = monograph_projects
+; dependencies[] = monograph_projects
 ; fails on setting permssions
 ; try features dev
-dependencies[] = monograph_editors
+; dependencies[] = monograph_editors
 ; dependencies[] = monograph_permissions
-dependencies[] = monograph_pages
+; dependencies[] = monograph_pages
 
 ; Developer
-dependencies[] = devel
-dependencies[] = devel_generate
-dependencies[] = simplehtmldom
-dependencies[] = devel_themer
-dependencies[] = coder
-dependencies[] = coder_review
+; dependencies[] = devel
+; dependencies[] = devel_generate
+; dependencies[] = simplehtmldom
+; dependencies[] = devel_themer
+; dependencies[] = coder
+; dependencies[] = coder_review
 dependencies[] = module_filter
 
 
