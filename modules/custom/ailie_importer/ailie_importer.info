@@ -3,3 +3,4 @@ description = Imports from isEngine database
 package = Feeds
 core = 7.x
 dependencies[] = feeds
+dependencies[] = media_feeds

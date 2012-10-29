@@ -18,24 +18,26 @@ class FeedsIsEngineParser extends FeedsParser {
     foreach ($xml->record as $record) {
 //  we need one parser for each content type so filter on that type
       if ( trim($record->category) == $content_type ) {
-        $item = array('title' => _decode_html($record->title));
+        error_log("Get title");
+        $item = array('title' => _decode_html($record->title->textContent));
         if ($record['modified']) {
           $item['modified'] = (int)$record['modified'];
         }
+        error_log("Get subtitle");
         if ($record->subtitle) {
-          $item['subtitle'] = _decode_html($record->subtitle);
+          $item['subtitle'] = _decode_html($record->subtitle->textContent);
         }
         if ($record->id) {
-          $item['isengine_id'] = $record->id;
+          $item['isengine_id'] = (int) $record->id->textContent;
         }
         if ($record->abstract) {
-          $item['abstract'] = _decode_html($record->abstract);
+          $item['abstract'] = _decode_html($record->abstract->textContent);
         }
         if ($record->description) {
-          $item['description'] = _decode_html($record->description);
+          $item['description'] = _decode_html($record->description->textContent);
         }
         if ($record->subcategory) {
-          $item['subcategory'] = (string) $record->subcategory;
+          $item['subcategory'] = (string) $record->subcategory->textContent;
         }
         if ($record->is_recent) {
           $item['is_recent'] = 1;
@@ -44,13 +46,13 @@ class FeedsIsEngineParser extends FeedsParser {
           $item['is_series'] = 1;
         }
         if ($record->collection_of) {
-          $item['collection_of'] = _decode_html($record->collection_of);
+          $item['collection_of'] = _decode_html($record->collection_of->textContent);
         }
         if ($record->cost) {
-          $item['cost'] = (string) $record->cost;
+          $item['cost'] = (string) (string) $record->cost->textContent;
         }
         if ($record->year) {
-          $year = $record->year;
+          $year = $record->year->textContent;
           if ( intval($year) > 3000 ) {
             // convert the integer into epoch and then into %Y
             $year = strftime('%Y', (int)$year);
@@ -61,16 +63,16 @@ class FeedsIsEngineParser extends FeedsParser {
           $item['is_sold'] = 1;
         }
         if ($record->thank_you) {
-          $item['thank_you'] = _decode_html($record->thank_you);
+          $item['thank_you'] = _decode_html($record->thank_you->textContent);
         }
         if ($record->media) {
-          $item['materials'] = _decode_html($record->media);
+          $item['materials'] = _decode_html($record->media->textContent);
         }
         if (count($record->exhibition)) {
           //  an array of exhibitions with title, venue, start and stop dates
           $exhibitions = array();
           foreach ( $record->gallery as $exhibition ) {
-            $title = trim($exhibition->title);
+            $title = trim((string)$exhibition->title->textContent);
             //  search for an exhibition with this title
             //  query
             //  SELECT nid FROM node WHERE node.title IS "$title"
@@ -91,16 +93,17 @@ class FeedsIsEngineParser extends FeedsParser {
             $attr = array();
             if ( $image->caption ) {
               error_log("Setting caption to " . $image->caption);
-              $attr['filename'] = trim($image->caption);
-              $attr['field_caption'] = trim($image->caption);
+              $attr['filename'] = trim((string) $image->caption->textContent);
+              $attr['field_caption'] = trim((string) $image->caption->textContent);
             }
             if ( $image->attribution )
-              $attr['field_attribution'] = trim($image->attribution);
-            if ( $image->colour )
-              $attr['field_colour'] = trim($image->colour);
+              $attr['field_attribution'] = trim((string) $image->attribution->textContent);
+//            if ( $image->colour )
+//              $attr['field_colour'] = trim((string) $image->colour->textContent);
               
             $file = _create_file_entity($src, $attr);
-            $images[] = $file->uri;
+            if ( $file )
+              $images[] = $file->uri;
           }
           if ( count($images) )
             $item['images'] = $images;
@@ -175,6 +178,13 @@ class FeedsIsEngineParser extends FeedsParser {
 
 //  http://drupal.org/node/1438668
 function _create_file_entity($src, $attrs=array(), $directory_path="feeds-importer") {
+  $temp_path = drupal_realpath('public://' . $directory_path);
+  if ( ! file_exists($temp_path) )
+    try {
+      mkdir($temp_path);
+    } catch (Exception $e) {
+      drupal_set_message("Could not create directory $directory_path.", 'error');
+    }
     // first check that the file exists
   if ( file_exists($src) ) {
         // create a file object for Drupal
@@ -182,7 +192,8 @@ function _create_file_entity($src, $attrs=array(), $directory_path="feeds-import
       'uri' => $src,
       'filemime' => file_get_mimetype($src),
       'status' => 1,
-      'display' => 'large',
+      'display' => 1,
+      'media_display' => 1,
     );    
   
     // now get Drupal to copy it
@@ -190,6 +201,8 @@ function _create_file_entity($src, $attrs=array(), $directory_path="feeds-import
     $basename = basename($src);
     $drupalfile = file_copy($file, 'public://' . $directory_path . "/" . $basename);
         // we should have a file object with an id.  The id is all we need
+    if ( ! $drupalfile )
+      return null;
     $fid = $drupalfile->fid;
 
     // load the entity for this file (note, returns an array, indexed on fid
@@ -199,9 +212,16 @@ function _create_file_entity($src, $attrs=array(), $directory_path="feeds-import
 
     $file_entity = $file_entities[$fid];
     foreach ($attrs as $key=>$value) {
-      error_log("Setting $key to $value");
-      $file_entity->$key = $value;
+      try {
+        error_log("Setting $key to $value");
+        $file_entity->$key = $value;
+      } catch (Exception $e) {
+        error_log('Caught exception: ',  $e->getMessage(), "\n");
+      }
     }
+    $file_entity->display = 1;
+    $file_entity->media_display = 1;
+    error_log("Saving file.");
     entity_save('file', $file_entity);
     error_log(var_export($file_entity, TRUE));
 
