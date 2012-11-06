@@ -15,11 +15,13 @@ class FeedsIsEngineParser extends FeedsParser {
     // Yes, using a DOM parser is a bit inefficient, but will do for now
     $xml = new SimpleXMLElement($fetcher_result->getRaw());
     $result = new FeedsParserResult();
-    foreach ($xml->record as $record) {
+//    foreach ($xml->record as $record) {
+    for ( $n = 0; $n < 10; $n++ ) {
+      $record = $xml->record[$n];
 //  we need one parser for each content type so filter on that type
       if ( trim($record->category) == $content_type ) {
         error_log("Get title");
-        $item = array('title' => _decode_html($record->title->textContent));
+        $item = array('title' => _decode_html($record->title));
         if ($record['modified']) {
           $item['modified'] = (int)$record['modified'];
         }
@@ -93,17 +95,16 @@ class FeedsIsEngineParser extends FeedsParser {
             $attr = array();
             if ( $image->caption ) {
               error_log("Setting caption to " . $image->caption);
-              $attr['filename'] = trim((string) $image->caption->textContent);
-              $attr['field_caption'] = trim((string) $image->caption->textContent);
+              $attr['filename'] = trim((string) $image->caption);
             }
             if ( $image->attribution )
-              $attr['field_attribution'] = trim((string) $image->attribution->textContent);
-//            if ( $image->colour )
-//              $attr['field_colour'] = trim((string) $image->colour->textContent);
+              $attr['field_attribution'] = trim((string) $image->attribution);
+            if ( $image->colour )
+              $attr['field_colour'] = trim((string) $image->colour);
               
             $file = _create_file_entity($src, $attr);
-            if ( $file )
-              $images[] = $file->uri;
+          //  if ( $file )
+          //    $images[] = $file->uri;
           }
           if ( count($images) )
             $item['images'] = $images;
@@ -179,12 +180,14 @@ class FeedsIsEngineParser extends FeedsParser {
 //  http://drupal.org/node/1438668
 function _create_file_entity($src, $attrs=array(), $directory_path="feeds-importer") {
   $temp_path = drupal_realpath('public://' . $directory_path);
-  if ( ! file_exists($temp_path) )
+  if ( ! file_exists($temp_path) ) {
     try {
       mkdir($temp_path);
     } catch (Exception $e) {
       drupal_set_message("Could not create directory $directory_path.", 'error');
     }
+  }
+
     // first check that the file exists
   if ( file_exists($src) ) {
         // create a file object for Drupal
@@ -199,28 +202,37 @@ function _create_file_entity($src, $attrs=array(), $directory_path="feeds-import
     // now get Drupal to copy it
     //  we need to split the file from the filename
     $basename = basename($src);
-    $drupalfile = file_copy($file, 'public://' . $directory_path . "/" . $basename);
-        // we should have a file object with an id.  The id is all we need
-    if ( ! $drupalfile )
+
+    $fileobj = file_copy($file, 'public://' . $directory_path . "/" . $basename);
+
+    // we should have a file object with an id.  The id is all we need
+    if ( ! $fileobj )
       return null;
-    $fid = $drupalfile->fid;
+    $fid = $fileobj->fid;
 
     // load the entity for this file (note, returns an array, indexed on fid
     $file_entities = entity_load('file', array($fid));
 //    if ( is_array($file_entities) )
-//      error_log("array keys " . implode(', ', array_keys($file_entities)));
 
     $file_entity = $file_entities[$fid];
+    error_log(var_export($file_entity, TRUE));
+
     foreach ($attrs as $key=>$value) {
       try {
         error_log("Setting $key to $value");
         $file_entity->$key = $value;
       } catch (Exception $e) {
         error_log('Caught exception: ',  $e->getMessage(), "\n");
+        error_log("Couldn't set $key to $value");
       }
     }
     $file_entity->display = 1;
     $file_entity->media_display = 1;
+    //  http://stackoverflow.com/questions/12369244/programattically-adding-file-fails-solved
+    //  set language
+    $file_entity->field_file = array(LANGUAGE_NONE => array('0' => (array)$fileobj));
+
+
     error_log("Saving file.");
     entity_save('file', $file_entity);
     error_log(var_export($file_entity, TRUE));
