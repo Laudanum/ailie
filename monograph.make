@@ -57,6 +57,9 @@ libraries[lessphp][download][url] = "git://github.com/leafo/lessphp.git"
 libraries[lessphp][destination] = "libraries"   
 
 projects[feeds][subdir] = "contrib"
+projects[media_feeds][subdir] = "contrib"
+projects[media_feeds][version] = "2.x-dev"
+
 projects[job_scheduler][subdir] = "contrib"
 
 ; projects

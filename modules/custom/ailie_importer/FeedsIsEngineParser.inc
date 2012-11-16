@@ -16,16 +16,14 @@ class FeedsIsEngineParser extends FeedsParser {
     $xml = new SimpleXMLElement($fetcher_result->getRaw());
     $result = new FeedsParserResult();
 //    foreach ($xml->record as $record) {
-    for ( $n = 0; $n < 10; $n++ ) {
+    for ( $n = 0; $n < 6; $n++ ) {
       $record = $xml->record[$n];
 //  we need one parser for each content type so filter on that type
       if ( trim($record->category) == $content_type ) {
-        error_log("Get title");
         $item = array('title' => _decode_html($record->title));
         if ($record['modified']) {
           $item['modified'] = (int)$record['modified'];
         }
-        error_log("Get subtitle");
         if ($record->subtitle) {
           $item['subtitle'] = _decode_html($record->subtitle->textContent);
         }
@@ -94,7 +92,6 @@ class FeedsIsEngineParser extends FeedsParser {
             $src = "public://xfiles/" . $id . "/" . $src;
             $attr = array();
             if ( $image->caption ) {
-              error_log("Setting caption to " . $image->caption);
               $attr['filename'] = trim((string) $image->caption);
             }
             if ( $image->attribution )
@@ -103,11 +100,16 @@ class FeedsIsEngineParser extends FeedsParser {
               $attr['field_colour'] = trim((string) $image->colour);
               
             $file = _create_file_entity($src, $attr);
-          //  if ( $file )
-          //    $images[] = $file->uri;
+            if ( $file ) {
+              error_log("Created file " . ($file->filename));
+              error_log(var_export($file, TRUE));
+              $images[] = $file->uri;
+            }
           }
-          if ( count($images) )
+          if ( count($images) ) {
             $item['images'] = $images;
+            error_log("Added " . count($images) . " images.");
+          }
         }
 
         $result->items[] = $item;
@@ -179,6 +181,7 @@ class FeedsIsEngineParser extends FeedsParser {
 
 //  http://drupal.org/node/1438668
 function _create_file_entity($src, $attrs=array(), $directory_path="feeds-importer") {
+  global $user;
   $temp_path = drupal_realpath('public://' . $directory_path);
   if ( ! file_exists($temp_path) ) {
     try {
@@ -193,10 +196,11 @@ function _create_file_entity($src, $attrs=array(), $directory_path="feeds-import
         // create a file object for Drupal
     $file = (object) array(
       'uri' => $src,
+      'uid' => $user->uid,
       'filemime' => file_get_mimetype($src),
       'status' => 1,
       'display' => 1,
-      'media_display' => 1,
+      //'media_display' => 1,
     );    
   
     // now get Drupal to copy it
@@ -215,27 +219,23 @@ function _create_file_entity($src, $attrs=array(), $directory_path="feeds-import
 //    if ( is_array($file_entities) )
 
     $file_entity = $file_entities[$fid];
-    error_log(var_export($file_entity, TRUE));
 
     foreach ($attrs as $key=>$value) {
       try {
-        error_log("Setting $key to $value");
         $file_entity->$key = $value;
       } catch (Exception $e) {
-        error_log('Caught exception: ',  $e->getMessage(), "\n");
-        error_log("Couldn't set $key to $value");
       }
     }
+    /*
+    // not required
+
     $file_entity->display = 1;
     $file_entity->media_display = 1;
     //  http://stackoverflow.com/questions/12369244/programattically-adding-file-fails-solved
     //  set language
     $file_entity->field_file = array(LANGUAGE_NONE => array('0' => (array)$fileobj));
-
-
-    error_log("Saving file.");
+    */
     entity_save('file', $file_entity);
-    error_log(var_export($file_entity, TRUE));
 
     //  reset the file name here
 
