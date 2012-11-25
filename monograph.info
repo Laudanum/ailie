@@ -89,10 +89,12 @@ dependencies[] = file_entity
 ; dependencies[] = coder
 ; dependencies[] = coder_review
 dependencies[] = module_filter
+dependencies[] = admin_menu_toolbar
 
-
-; Information added by drush on 2012-06-25
-version = "master-dev"
-project = "monograph"
-datestamp = "1340622097"
-
+dependencies[] = ailie_classes
+dependencies[] = ailie_exhibitions
+dependencies[] = ailie_importer
+dependencies[] = ailie_importer_feeds
+dependencies[] = ailie_works
+dependencies[] = ailie_workshops
+dependencies[] = feeds_admin_ui

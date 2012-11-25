@@ -6,8 +6,10 @@ class FeedsIsEngineParser extends FeedsParser {
   /**
    * Implements FeedsParser::parse().
    */
+  protected $content_type = 'work';
+
   public function parse(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
-    $content_type = 'work';
+    error_log("Importing " . $content_type);
 
     // Set time zone to GMT for parsing dates with strtotime().
     $tz = date_default_timezone_get();
@@ -15,11 +17,11 @@ class FeedsIsEngineParser extends FeedsParser {
     // Yes, using a DOM parser is a bit inefficient, but will do for now
     $xml = new SimpleXMLElement($fetcher_result->getRaw());
     $result = new FeedsParserResult();
-//    foreach ($xml->record as $record) {
-    for ( $n = 0; $n < 6; $n++ ) {
-      $record = $xml->record[$n];
+    foreach ($xml->record as $record) {
+//    for ( $n = 0; $n < 6; $n++ ) {
+//      $record = $xml->record[$n];
 //  we need one parser for each content type so filter on that type
-      if ( trim($record->category) == $content_type ) {
+      if ( trim($record->category) == $this->content_type ) {
         $item = array('title' => _decode_html($record->title));
         if ($record['modified']) {
           $item['modified'] = (int)$record['modified'];
@@ -102,7 +104,6 @@ class FeedsIsEngineParser extends FeedsParser {
             $file = _create_file_entity($src, $attr);
             if ( $file ) {
               error_log("Created file " . ($file->filename));
-              error_log(var_export($file, TRUE));
               $images[] = $file->uri;
             }
           }
@@ -128,21 +129,39 @@ class FeedsIsEngineParser extends FeedsParser {
         'name' => t('Title'),
         'description' => t('URL of the feed item.'),
       ),
+      'is_engine_id' => array(
+        'name' => t('Legacy ID'),
+        'description' => t('The original ID of the record.'),
+      ),
       'subtitle' => array(
         'name' => t('Subtitle'),
-        'description' => t('Last modified date as UNIX time GMT of the feed item.'),
       ),
       'abstract' => array(
         'name' => t('Abstract'),
-        'description' => t('How frequently the page is likely to change.'),
       ),
       'description' => array(
         'name' => t('Description'),
-        'description' => t('The priority of this URL relative to other URLs on the site.'),
       ),
       'subcategory' => array(
         'name' => t('Subcategory'),
       ),
+      'modified' => array(
+        'name' => t('Date modified'),
+      ),
+      'images' => array(
+        'name' => t('Images'),
+        'description' => t('An array of images.')
+      ),
+    ) + parent::getMappingSources();
+  }
+}
+
+
+class FeedsIsEngineWorksParser extends FeedsIsEngineParser {
+  protected $content_type = 'work';
+
+  public function getMappingSources() {
+    return array(
       'is_recent' => array(
         'name' => t('Is recent'),
       ),
@@ -164,24 +183,179 @@ class FeedsIsEngineParser extends FeedsParser {
       'year' => array(
         'name' => t('Year'),
       ),
-      'modified' => array(
-        'name' => t('Date modified'),
-      ),
       'materials' => array(
         'name' => t('Media'),
         'description' => t('Materials used to create the work.')
-      ),
-      'images' => array(
-        'name' => t('Images'),
-        'description' => t('An array of images.')
       ),
     ) + parent::getMappingSources();
   }
 }
 
+
+class FeedsIsEngineExhibitionsParser extends FeedsIsEngineParser {
+  protected $content_type = 'exhibition';
+
+  public function getMappingSources() {
+    return array(
+      'is_solo' => array(
+        'name' => t('Solo?'),
+      ),
+      'date_preview' => array(
+        'name' => t('Preview date'),
+      ),
+      'date_start' => array(
+        'name' => t('Start date'),
+      ),
+      'date_end' => array(
+        'name' => t('End date'),
+      ),
+      'venue_name' => array(
+        'name' => t('Venue name'),
+      ),
+      'venue_address' => array(
+        'name' => t('Venue address'),
+      ),
+      'venue_link' => array(
+        'name' => t('Venue link'),
+      ),
+      'venue_hours' => array(
+        'name' => t('Venue opening hours'),
+      ),
+      //  @TODO
+      //  review, attribution, link (repeating)
+
+      //  quote, quotation, attribution (repeating)
+
+      //  invite image (repeating)
+
+      //  catalog, image, essay, publisher (repeating)
+    ) + parent::getMappingSources();
+  }
+}
+
+//   16 workshops
+class FeedsIsEngineWorkshopsParser extends FeedsIsEngineParser {
+  protected $content_type = 'workshop';
+
+  public function getMappingSources() {
+    return array(
+      'outline' => array(
+        'name' => t('Workshop outline'),
+      ),
+      'lesson_plan' => array(
+        'name' => t('Lesson plan'),
+      ),
+      'requirement_list' => array(
+        'name' => t('Requirement list'),
+      ),
+      'skill_level' => array(
+        'name' => t('Skill level'),
+      ),
+      'days' => array(
+        'name' => t('Number of days'),
+      ),
+      'hours_a_day' => array(
+        'name' => t('Hours per day'),
+      ),
+      'cost' => array(
+        'name' => t('Cost'),
+      ),
+      'cost_notes' => array(
+        'name' => t('Cost notes'),
+      ),
+      'max_class_size' => array(
+        'name' => t('Maximum class size'),
+      ),
+      'course_notes' => array(
+        'name' => t('Course notes'),
+      ),
+      'venue_requirements' => array(
+        'name' => t('Venue requirements'),
+      ),
+      'history' => array(
+        'name' => t('History'),
+      ),
+    ) + parent::getMappingSources();
+  }
+}
+
+
+class FeedsIsEngineClassesParser extends FeedsIsEngineParser {
+  protected $content_type = 'class';
+
+  public function getMappingSources() {
+    return array(
+      'organisation_name' => array(
+        'name' => t('Organising organisation'),
+      ),
+      'organisation_contact' => array(
+        'name' => t('Organising contact'),
+      ),
+      'organisation_bookings' => array(
+        'name' => t('Organising bookings'),
+      ),
+      'outline' => array(
+        'name' => t('Class outline'),
+      ),
+      'date_start' => array(
+        'name' => t('Start date'),
+      ),
+      'date_stop' => array(
+        'name' => t('Stop date'),
+      ),
+      'venue_name' => array(
+        'name' => t('Venue'),
+      ),
+      'venue_address' => array(
+        'name' => t('Venue address'),
+      ),
+      'venue_country' => array(
+        'name' => t('Venue country'),
+      ),
+    ) + parent::getMappingSources();
+  }
+}
+
+
+class FeedsIsEngineNewsParser extends FeedsIsEngineParser {
+  protected $content_type = 'news';
+
+  public function getMappingSources() {
+    return array(
+      'date' => array(
+        'name' => t('News date'),
+      ),
+      'link' => array(
+        'name' => t('News link'),
+      ),
+    ) + parent::getMappingSources();
+  }
+}
+
+
+class FeedsIsEngineQuotesParser extends FeedsIsEngineParser {
+  protected $content_type = 'quote';
+
+  public function getMappingSources() {
+    return array(
+      'attribution' => array(
+        'name' => t('Quote attribution'),
+      ),
+      'quote' => array(
+        'name' => t('Quotation'),
+      ),
+      'date' => array(
+        'name' => t('Date'),
+      ),
+    ) + parent::getMappingSources();
+  }
+}
+
+
 //  http://drupal.org/node/1438668
 function _create_file_entity($src, $attrs=array(), $directory_path="feeds-importer") {
   global $user;
+  //  we could check to see if the file already exists.
   $temp_path = drupal_realpath('public://' . $directory_path);
   if ( ! file_exists($temp_path) ) {
     try {

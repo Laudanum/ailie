@@ -71,6 +71,7 @@ projects[link][subdir] = "contrib"
 projects[date][subdir] = "contrib"
 projects[field_collection][subdir] = "contrib"
 projects[field_collection][version] = "1.x-dev"
+projects[field_collection][patch][1063434-89] = http://drupal.org/files/field_collection-feeds_integration-1063434-89.patch
 projects[entityreference][version] = "1.x-dev"
 
 ; social

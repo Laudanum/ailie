@@ -2,5 +2,5 @@ libraries/
 modules/contrib/
 modules/developer/
 themes/contrib/
-
+.AppleDouble
 .DS_Store

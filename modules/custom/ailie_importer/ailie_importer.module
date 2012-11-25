@@ -3,11 +3,71 @@
     function ailie_importer_feeds_plugins() {
         $info = array();
         $info['IsEngineParser'] = array(
-            'name' => 'isEngine Works Parser',
-            'description' => 'Imports works from the Ailie DB.',
+            'name' => 'Ailie Parser',
+            'description' => 'Base class importer. Duplicates Works importer.',
             'handler' => array(
                 'parent' => 'FeedsParser', // A plugin needs to derive either directly or indirectly from FeedsFetcher, FeedsParser or FeedsProcessor.
                 'class' => 'FeedsIsEngineParser',
+                'file' => 'FeedsIsEngineParser.inc',
+                'path' => drupal_get_path('module', 'ailie_importer'),
+            ),
+        );
+        $info['IsEngineWorksParser'] = array(
+            'name' => 'Ailie Works Parser',
+            'description' => 'Imports works from the Ailie DB.',
+            'handler' => array(
+                'parent' => 'FeedsParser', // A plugin needs to derive either directly or indirectly from FeedsFetcher, FeedsParser or FeedsProcessor.
+                'class' => 'FeedsIsEngineWorksParser',
+                'file' => 'FeedsIsEngineParser.inc',
+                'path' => drupal_get_path('module', 'ailie_importer'),
+            ),
+        );
+        $info['IsEngineExhibitionsParser'] = array(
+            'name' => 'Ailie Exhibitions Parser',
+            'description' => 'Imports exhibitions from the Ailie DB.',
+            'handler' => array(
+                'parent' => 'FeedsParser', // A plugin needs to derive either directly or indirectly from FeedsFetcher, FeedsParser or FeedsProcessor.
+                'class' => 'FeedsIsEngineExhibitionsParser',
+                'file' => 'FeedsIsEngineParser.inc',
+                'path' => drupal_get_path('module', 'ailie_importer'),
+            ),
+        );
+        $info['IsEngineWorkshopsParser'] = array(
+            'name' => 'Ailie Workshops Parser',
+            'description' => 'Imports workshops from the Ailie DB.',
+            'handler' => array(
+                'parent' => 'FeedsParser', // A plugin needs to derive either directly or indirectly from FeedsFetcher, FeedsParser or FeedsProcessor.
+                'class' => 'FeedsIsEngineWorkshopsParser',
+                'file' => 'FeedsIsEngineParser.inc',
+                'path' => drupal_get_path('module', 'ailie_importer'),
+            ),
+        );
+        $info['IsEngineClassesParser'] = array(
+            'name' => 'Ailie Classes Parser',
+            'description' => 'Imports classes from the Ailie DB.',
+            'handler' => array(
+                'parent' => 'FeedsParser', // A plugin needs to derive either directly or indirectly from FeedsFetcher, FeedsParser or FeedsProcessor.
+                'class' => 'FeedsIsEngineClassesParser',
+                'file' => 'FeedsIsEngineParser.inc',
+                'path' => drupal_get_path('module', 'ailie_importer'),
+            ),
+        );
+        $info['IsEngineNewsarser'] = array(
+            'name' => 'Ailie News Parser',
+            'description' => 'Imports news from the Ailie DB.',
+            'handler' => array(
+                'parent' => 'FeedsParser', // A plugin needs to derive either directly or indirectly from FeedsFetcher, FeedsParser or FeedsProcessor.
+                'class' => 'FeedsIsEngineNewsParser',
+                'file' => 'FeedsIsEngineParser.inc',
+                'path' => drupal_get_path('module', 'ailie_importer'),
+            ),
+        );
+        $info['IsEngineQuotesParser'] = array(
+            'name' => 'Ailie Quotes Parser',
+            'description' => 'Imports quotes from the Ailie DB.',
+            'handler' => array(
+                'parent' => 'FeedsParser', // A plugin needs to derive either directly or indirectly from FeedsFetcher, FeedsParser or FeedsProcessor.
+                'class' => 'FeedsIsEngineQuotesParser',
                 'file' => 'FeedsIsEngineParser.inc',
                 'path' => drupal_get_path('module', 'ailie_importer'),
             ),
